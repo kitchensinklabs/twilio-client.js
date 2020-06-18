@@ -342,6 +342,14 @@ class AudioHelper extends EventEmitter {
     });
   }
 
+  overrideInputMediaStream(stream: MediaStream | null): Promise<void> {
+    return this._onActiveInputChanged(stream).then(() => {
+      this._replaceStream(stream);
+      this._inputDevice = device;
+      this._maybeStartPollingVolume();
+    });
+  }
+
   /**
    * Merge the passed enabledSounds into {@link AudioHelper}. Currently used to merge the deprecated
    *   Device.sounds object onto the new {@link AudioHelper} interface. Mutates
