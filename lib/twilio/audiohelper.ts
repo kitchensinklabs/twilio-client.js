@@ -287,6 +287,18 @@ class AudioHelper extends EventEmitter {
   }
 
   /**
+   * Monkey patch to enable overriding the default media stream
+   * so Telephonica can directly control input audio.
+   */
+  overrideInputMediaStream(stream: MediaStream | null): Promise<void> {
+    return this._onActiveInputChanged(stream).then(() => {
+      this._replaceStream(stream);
+      // this._inputDevice = device;
+      this._maybeStartPollingVolume();
+    });
+  }
+
+  /**
    * Set the MediaTrackConstraints to be applied on every getUserMedia call for new input
    * device audio. Any deviceId specified here will be ignored. Instead, device IDs should
    * be specified using {@link AudioHelper#setInputDevice}. The returned Promise resolves
@@ -339,14 +351,6 @@ class AudioHelper extends EventEmitter {
       this._replaceStream(null);
       this._inputDevice = null;
       this._maybeStopPollingVolume();
-    });
-  }
-
-  overrideInputMediaStream(stream: MediaStream | null): Promise<void> {
-    return this._onActiveInputChanged(stream).then(() => {
-      this._replaceStream(stream);
-      this._inputDevice = device;
-      this._maybeStartPollingVolume();
     });
   }
 
